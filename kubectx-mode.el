@@ -31,7 +31,7 @@
 (defvar kubectx-mode-line-update-timer nil)
 (defvar kubectx-mode-line-string "")
 (defvar kubectx-mode-line-update-interval 5 "Number of seconds between background mode-line updates.")
-(defvar kubectx-mode-line-string-format " [kube:%C %N]" "String to display in mode-line (%C = context, %N = namespace).")
+(defvar kubectx-mode-line-string-format "[%C:%N]" "String to display in mode-line (%C = context, %N = namespace).")
 (defvar kubectx-mode-map
   (let ((km (make-sparse-keymap)))
     (define-key km (kbd "C-c C-k c") #'kubectx-set-context)
@@ -79,7 +79,7 @@
 (defun kubectx-mode-line-update ()
   "Update kubectx mode-line string with current context and namespace."
   (interactive)
-  (let ((ctx (kubectx-run-kubectl-command "config" "current-context"))
+  (let ((ctx (first (last (split-string (kubectx-run-kubectl-command "config" "current-context") "/"))))
         (ns (kubectx-run-kubectl-command "config" "view" "--minify" "--output" "jsonpath={..namespace}")))
     (setq kubectx-mode-line-string (kubectx-mode-line-string ctx ns))
     (force-mode-line-update t)))
